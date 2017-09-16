@@ -29,7 +29,7 @@ A merge conflict can come up when you're trying to merge two branches, but both 
 Clone this GitHub repository.  This will download the files in this repository onto your local computer.
 On the command line (i.e. Git shell):
 ```
-$ git clone https://github.com/WHSDigitalMedia/new-member-training.git
+git clone https://github.com/WHSDigitalMedia/new-member-training.git
 ```
 
 If you want to learn some useful stuff for the command line, click [here](#optional-command-line-stuff) for some tips.
@@ -41,28 +41,52 @@ For training purposes we want to make a merge conflict happen.  We'll set up thi
 
 ![Merge conflict image](/img/merge_conflict.png "Merge conflict")
 
-If you look at the file `TrainingProgram.java` you'll notice that there are some things that need to be changed:
-```java
-public class TrainingProgram {
-  public static void main(String[] args) {
-    System.out.println("Robotics is fun!");
-    System.out.println("My favorite robot is R2-D2.");
-    System.out.println("Can't wait for the Velocity Vortex season!");
-    System.out.println("Better get ready!");
-  }
+If you look at the file `class_npc.txt` you'll notice that there are some things that need to be changed:
+```
+///Create Event
+name = "";
+action = noone;
+text_color = c_white;
+center = false;
+font = fnt_textbox;
+spr = spr_main_menu_start;
+strWidth = string_width(name) * global.textScale;
+strHeight = string_height(name) * global.textScale;
+
+///Step Event
+strWidth = string_width(name) * global.textScale;
+strHeight = string_height(name) * global.textScale;
+
+if isOver(self, 0, 0, 0, 0) {
+    if mouse_check_button_pressed(mb_left) script_execute(action);
 }
+
+///Draw GUI Event
+draw_self();
+if sprite_get_width(spr) < strWidth image_xscale = 1.2 * (strWidth / sprite_get_width(spr));
+draw_set_font(fnt_textbox);
+
+if center {
+    draw_set_halign(fa_center);
+    draw_set_valign(fa_middle);
+}
+
+draw_set_color(text_color);
+draw_text_transformed(x, y, name, global.textScale, global.textScale, 0);
+
+draw_set_halign(fa_left);
+draw_set_valign(fa_top);
 ```
 
-Our favorite robot is not R2-D2, and it is currently not the Velocity Vortex FTC season.
-We'll fix these changes in our own branch called `text-fixes`.
+The distance to the player should be 64, not 128, and `scr_text3` and `scr_text2` need to swap positions!
+We'll fix these changes in our own branch called `script-fixes`.
 
 
 ## Making a new branch
-To make a new branch called `text-fixes`, run this on the command line.
-```
-$ git checkout -b text-fixes
-```
-The `-b` means "make a new branch."
+To make a new branch called `script-fixes`, run this on the command line:
+`git branch script-fixes`
+
+Then you can check on the status of your branches by typing: `git branch`.
 
 Edit lines 4-5 in `TrainingProgram.java` as such:
 ```java

@@ -1,0 +1,33 @@
+///Create Event
+name = "";
+action = noone;
+text_color = c_white;
+center = false;
+font = fnt_textbox;
+spr = spr_main_menu_start;
+strWidth = string_width(name) * global.textScale;
+strHeight = string_height(name) * global.textScale;
+
+///Step Event
+strWidth = string_width(name) * global.textScale;
+strHeight = string_height(name) * global.textScale;
+
+if isOver(self, 0, 0, 0, 0) {
+    if mouse_check_button_pressed(mb_left) script_execute(action);
+}
+
+///Draw GUI Event
+draw_self();
+if sprite_get_width(spr) < strWidth image_xscale = 1.2 * (strWidth / sprite_get_width(spr));
+draw_set_font(fnt_textbox);
+
+if center {
+    draw_set_halign(fa_center);
+    draw_set_valign(fa_middle);
+}
+
+draw_set_color(text_color);
+draw_text_transformed(x, y, name, global.textScale, global.textScale, 0);
+
+draw_set_halign(fa_left);
+draw_set_valign(fa_top);
