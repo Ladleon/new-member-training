@@ -84,8 +84,8 @@ We'll fix these changes in our own branch called `script-fixes`.
 
 ## Making a new branch
 To make a new branch called `script-fixes` with PowerShell, type:
-`git branch script-fixes`
-Then you can check on the status of your branches by typing: `git branch`.
+`git branch script-fixes`. Then you can check on the status of your branches by typing: `git branch`.
+Switch over to `script-fixes` by typing: `git checkout script-fixes`.
 
 Edit line 6 in `class_button.txt` as such:
 ```
@@ -99,7 +99,7 @@ Edit line 16 in `class_button.txt` as such:
 What do we do next?  We can check the status of our git repository:
 ```
 git status
-On branch text-fixes
+On branch script-fixes
 Changes not staged for commit:
   (use "git add <file>..." to update what will be committed)
   (use "git checkout -- <file>..." to discard changes in working directory)
@@ -373,7 +373,7 @@ Let's say you want to add a file `class_player.txt` to your remote repository `t
 
 0c. Now, create a file in that folder called `class_player.txt`.
 
-Add, commit, and push the files following any of these (or your own favorite client):
+0d. Then in PowerShell, add the file to the staging area, commit, then push to the remote. You can use any of the following:
 
 - [the command line](https://help.github.com/articles/adding-a-file-to-a-repository-using-the-command-line/)
 
