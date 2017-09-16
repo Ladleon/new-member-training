@@ -29,7 +29,7 @@ A merge conflict can come up when you're trying to merge two branches, but both 
 Clone this GitHub repository.  This will download the files in this repository onto your local computer.
 On the command line (i.e. Git shell):
 ```
-$ git clone https://github.com/WHSRobotics/new-member-training.git
+$ git clone https://github.com/WHSDigitalMedia/new-member-training.git
 ```
 
 If you want to learn some useful stuff for the command line, click [here](#optional-command-line-stuff) for some tips.
