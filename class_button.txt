@@ -3,7 +3,7 @@ name = "";
 action = noone;
 text_color = c_white;
 center = false;
-font = fnt_textbox;
+font = fnt_comic_sans;
 spr = spr_main_menu_start;
 strWidth = string_width(name) * global.textScale;
 strHeight = string_height(name) * global.textScale;
@@ -13,7 +13,7 @@ strWidth = string_width(name) * global.textScale;
 strHeight = string_height(name) * global.textScale;
 
 if isOver(self, 0, 0, 0, 0) {
-    if mouse_check_button_pressed(mb_left) script_execute(action);
+    if mouse_check_button_pressed(mb_right) script_execute(action);
 }
 
 ///Draw GUI Event
