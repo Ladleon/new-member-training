@@ -41,7 +41,219 @@ For training purposes we want to make a merge conflict happen.  We'll set up thi
 
 ![Merge conflict image](/img/merge_conflict.png "Merge conflict")
 
-If you look at the file `class_npc.txt` you'll notice that there are some things that need to be changed:
+Take a look at the file `class_button.txt`; there are some things that need to be changed:
+```
+///Create Event
+name = "";
+action = noone;
+text_color = c_white;
+center = false;
+font = fnt_comic_sans;
+spr = spr_main_menu_start;
+strWidth = string_width(name) * global.textScale;
+strHeight = string_height(name) * global.textScale;
+
+///Step Event
+strWidth = string_width(name) * global.textScale;
+strHeight = string_height(name) * global.textScale;
+
+if isOver(self, 0, 0, 0, 0) {
+    if mouse_check_button_pressed(mb_right) script_execute(action);
+}
+
+///Draw GUI Event
+draw_self();
+if sprite_get_width(spr) < strWidth image_xscale = 1.2 * (strWidth / sprite_get_width(spr));
+draw_set_font(fnt_textbox);
+
+if center {
+    draw_set_halign(fa_center);
+    draw_set_valign(fa_middle);
+}
+
+draw_set_color(text_color);
+draw_text_transformed(x, y, name, global.textScale, global.textScale, 0);
+
+draw_set_halign(fa_left);
+draw_set_valign(fa_top);
+```
+
+Not only should the font be `fnt_textbox` instead of `fnt_comic_sans`, but we should be checking for a left mouse click, not a right mouse click!
+We'll fix these changes in our own branch called `script-fixes`.
+
+
+## Making a new branch
+To make a new branch called `script-fixes` with PowerShell, type:
+`git branch script-fixes`
+Then you can check on the status of your branches by typing: `git branch`.
+
+Edit line 6 in `class_button.txt` as such:
+```
+font = fnt_textbox;
+```
+Edit line 16 in `class_button.txt` as such:
+```
+    if mouse_check_button_pressed(mb_right) script_execute(action);
+```
+
+What do we do next?  We can check the status of our git repository:
+```
+git status
+On branch text-fixes
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   class_button.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+
+It shows that `class_button.txt` needs to be staged.
+
+If you want to brush up on your git, click [here](#optional-discussion-about-git-workflow) for an optional discussion about git workflow.
+
+
+## Committing our work
+
+Then let's stage and commit this to get ready to put it back onto the remote repository on GitHub.
+
+To stage it:
+```
+git add class_button.txt
+```
+To commit it:
+```
+git commit -m "Change font and toggle action"
+[script-fixes 6941ee1] Change font and toggle action
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+```
+Note: `git add *` will add all changed files to the staging area. Generally speaking, `*` means 'all'.
+
+Now we just have to go back to the master branch and merge this `script-fixes` branch into it.
+
+This is how our repository looks like:
+
+![Committed to text-fixes branch image](/img/merge_text-fixes.png "Committed to text-fixes branch")
+
+
+## Simulating someone else's work
+
+In the meantime while you were making that branch, Garrett with his super speedy typing fingers already updated `class_button.txt` with his favorite font.  However he was not a cooperative teammate and he already pushed this change to master.  Let's simulate this by editing the `class_button.txt` file on the master branch.
+
+Switch to the master branch:
+```
+git checkout master
+Switched to branch 'master'
+Your branch is up-to-date with 'origin/master'.
+```
+
+Edit line 6 of `class_npc.txt` as follows (or at least have a favorite font that's not fnt_texbox):
+```
+font = fnt_impact;
+```
+
+Note that Garrett didn't pay attention to the mouse toggle and still left it at `mb_right`.
+
+Stage and commit the file:
+```
+git add class_button.txt
+git commit -m "Favorite font"
+```
+
+Now this is how our repository looks.  Thanks Garrett.
+
+![Merge conflict image](/img/merge_conflict.png "Merge conflict")
+
+
+## Try to merge your branch into master
+
+Now is your time to shine with your git wizardry.
+
+Make sure you're on the master branch:
+```
+git checkout master
+```
+
+Then to merge your changes (font is textbox, mouse toggle is left-click) into the master branch:
+```
+git merge script-fixes
+Auto-merging class_button.txt
+CONFLICT (content): Merge conflict in class_button.txt
+Automatic merge failed; fix conflicts and then commit the result.
+```
+
+## What the merge conflict looks like
+Here is the infamous merge conflict in all of its glory.  Open up `class_button.txt` and you'll see:
+```
+///Create Event
+name = "";
+action = noone;
+text_color = c_white;
+center = false;
+<<<<<<< HEAD
+font = fnt_impact;
+=======
+font = fnt_textbox;
+>>>>>> script-fixes
+spr = spr_main_menu_start;
+strWidth = string_width(name) * global.textScale;
+strHeight = string_height(name) * global.textScale;
+
+///Step Event
+strWidth = string_width(name) * global.textScale;
+strHeight = string_height(name) * global.textScale;
+
+if isOver(self, 0, 0, 0, 0) {
+    <<<<<<< HEAD
+    if mouse_check_button_pressed(mb_right) script_execute(action);
+    =======
+    if mouse_check_button_pressed(mb_left) script_execute(action);
+    >>>>>>> script-fixes
+}
+
+///Draw GUI Event
+draw_self();
+if sprite_get_width(spr) < strWidth image_xscale = 1.2 * (strWidth / sprite_get_width(spr));
+draw_set_font(fnt_textbox);
+
+if center {
+    draw_set_halign(fa_center);
+    draw_set_valign(fa_middle);
+}
+
+draw_set_color(text_color);
+draw_text_transformed(x, y, name, global.textScale, global.textScale, 0);
+
+draw_set_halign(fa_left);
+draw_set_valign(fa_top);
+```
+
+git tried to merge the files, saw that they were different in the same places, and is saying, "hey humans, please figure this out."
+However it is nice and does show you both of the changes in the same file.
+
+These parts are from the master branch (Garrett's edits)
+```
+<<<<<<< HEAD
+font = fnt_impact;
+=======
+    <<<<<<< HEAD
+    if mouse_check_button_pressed(mb_right) script_execute(action);
+    =======
+```
+
+These parts are from the `script-fixes` branch (your edits)
+```java
+font = fnt_textbox;
+>>>>>> script-fixes
+    if mouse_check_button_pressed(mb_left) script_execute(action);
+    >>>>>>> script-fixes
+```
+
+## Fixing the merge conflict
+
+Talk with Garrett and reach an agreement on what the font and mouse toggle should be.
+Then edit `class_button.txt` accordingly.  Sample follows:
 ```
 ///Create Event
 name = "";
@@ -78,163 +290,9 @@ draw_set_halign(fa_left);
 draw_set_valign(fa_top);
 ```
 
-The distance to the player should be 64, not 128, and `scr_text3` and `scr_text2` need to swap positions!
-We'll fix these changes in our own branch called `script-fixes`.
-
-
-## Making a new branch
-To make a new branch called `script-fixes`, run this on the command line:
-`git branch script-fixes`
-
-Then you can check on the status of your branches by typing: `git branch`.
-
-Edit lines 4-5 in `TrainingProgram.java` as such:
-```java
-    System.out.println("My favorite robot is BB-8.");
-    System.out.println("Can't wait for the Relic Recovery season!");
-```
-
-What do we do next?  We can check the status of our git repository:
-```
-$ git status
-On branch text-fixes
-Changes not staged for commit:
-  (use "git add <file>..." to update what will be committed)
-  (use "git checkout -- <file>..." to discard changes in working directory)
-
-	modified:   TrainingProgram.java
-
-no changes added to commit (use "git add" and/or "git commit -a")
-```
-
-It shows that `TrainingProgram.java` needs to be staged.
-
-If you want to brush up on your git, click [here](#optional-discussion-about-git-workflow) for an optional discussion about git workflow.
-
-
-## Committing our work
-
-Then let's stage and commit this to get ready to put it back onto the remote repository on GitHub.
-
-To stage it:
-```
-$ git add TrainingProgram.java
-```
-
-To commit it:
-```
-$ git commit -m "Change favorite robot and season"
-[text-fixes 6941ee1] Change favorite robot and season
- 1 file changed, 2 insertions(+), 2 deletions(-)
-```
-
-Now we just have to go back to the master branch and merge this `text-fixes` branch into it.
-
-This is how our repository looks like:
-
-![Committed to text-fixes branch image](/img/merge_text-fixes.png "Committed to text-fixes branch")
-
-
-## Simulating someone else's work
-
-In the meantime while you were making that branch, Amar with his super speedy typing fingers already updated `TrainingProgram.java` with his favorite robot.  However he was not a cooperative teammate and he already pushed this change to master.  Let's simulate this by editing the `TrainingProgram.java` file on the master branch.
-
-Switch to the master branch:
-```
-$ git checkout master
-Switched to branch 'master'
-Your branch is up-to-date with 'origin/master'.
-```
-
-Edit line 4 of `TrainingProgram.java` as follows (or at least have a favorite robot that's not BB-8):
-```java
-    System.out.println("My favorite robot is WALL-E.");
-```
-
-Note that Amar didn't pay attention to the FTC season and still left it at Velocity Vortex.
-
-Stage and commit the file:
-```
-$ git add TrainingProgram.java
-$ git commit -m "fav bot"
-```
-
-Now this is how our repository looks.  Thanks Amar.
-
-![Merge conflict image](/img/merge_conflict.png "Merge conflict")
-
-
-## Try to merge your branch into master
-
-Now is your time to shine with your git wizardry.
-
-Make sure you're on the master branch:
-```
-$ git checkout master
-```
-
-Then to merge your changes (favorite robot is BB-8, updated season to Relic Recovery) into the master branch:
-```
-$ git merge text-fixes
-Auto-merging TrainingProgram.java
-CONFLICT (content): Merge conflict in TrainingProgram.java
-Automatic merge failed; fix conflicts and then commit the result.
-```
-
-## What the merge conflict looks like
-Here is the infamous merge conflict in all of its glory.  Open up `TrainingProgram.java` and you'll see:
-```java
-public class TrainingProgram {
-  public static void main(String[] args) {
-    System.out.println("Robotics is fun!");
-<<<<<<< HEAD
-    System.out.println("My favorite robot is WALL-E.");
-    System.out.println("Can't wait for the Velocity Vortex season!");
-=======
-    System.out.println("My favorite robot is BB-8.");
-    System.out.println("Can't wait for the Relic Recovery season!");
->>>>>>> text-fixes
-    System.out.println("Better get ready!");
-  }
-```
-
-git tried to merge the files, saw that they were different in the same places, and is saying, "hey humans, please figure this out."
-However it is nice and does show you both of the changes in the same file.
-
-This part is from the master branch (Amar's edits)
-```java
-<<<<<<< HEAD
-    System.out.println("My favorite robot is WALL-E.");
-    System.out.println("Can't wait for the Velocity Vortex season!");
-=======
-```
-
-This part is from the `text-fixes` branch (your edits)
-```java
-=======
-    System.out.println("My favorite robot is BB-8.");
-    System.out.println("Can't wait for the Relic Recovery season!");
->>>>>>> text-fixes
-```
-
-## Fixing the merge conflict
-
-Talk with your teammate Amar and reach an agreement on what the favorite robot and the FTC season should be.
-Then edit `TrainingProgram.java` accordingly.  Sample follows:
-```java
-public class TrainingProgram {
-  public static void main(String[] args) {
-    System.out.println("Robotics is fun!");
-    System.out.println("My favorite robot is EVE.");
-    System.out.println("Can't wait for the Relic Recovery season!");
-    System.out.println("Better get ready!");
-  }
-}
-```
-
 Checking the status of our repo:
 ```
-$ git status
+git status
 On branch master
 Your branch is ahead of 'origin/master' by 1 commit.
   (use "git push" to publish your local commits)
@@ -250,49 +308,18 @@ Unmerged paths:
 no changes added to commit (use "git add" and/or "git commit -a")
 ```
 
-So let's stage and commit our newly reconciled file and be friends.
+We want to push to the origin, but Git tells us that there are unmerged paths. We just fixed that error, so let's stage and commit our newly reconciled file.
 ```
-$ git add TrainingProgram.java
-$ git commit -m "Reconciled bot and season"
-[master 4bc3aba] Reconciled bot and season
+git add class_button.txt
+git commit -m "Reconciled font and mouse toggle"
+[master 4bc3aba] Reconciled font and mouse toggle"
 ```
 
-Checking our commit history we can see that all is well:
-```
-$ git log
-commit 4bc3aba7a6f8b30075d59a605c955376ef182b86
-Merge: 5150103 6941ee1
-Author: Proud Heng <pheng@ucsd.edu>
-Date:   Mon Sep 11 20:28:59 2017 -0700
-
-    Reconciled bot and season
-
-commit 515010394c8ec554a3943a8e87b035ebb174f1e9
-Author: Proud Heng <pheng@ucsd.edu>
-Date:   Mon Sep 11 19:29:46 2017 -0700
-
-    fav bot
-
-commit 6941ee1c65174e1d97f1615c66de0c279042035f
-Author: Proud Heng <pheng@ucsd.edu>
-Date:   Mon Sep 11 19:26:55 2017 -0700
-
-    Change favorite robot and season
-
-commit f7c96d85072446f196e200b08576ea72e7046d52
-Author: Proud Heng <pheng@ucsd.edu>
-Date:   Mon Sep 11 19:24:04 2017 -0700
-
-    Init
-
-commit 48ed824c48e67dda2165a496dd1c1e0920f23436
-Author: proudh <pheng@ucsd.edu>
-Date:   Mon Sep 11 19:22:43 2017 -0700
-
-    Initial commit
-```
+You can check the commit history with the command `git log` to see that all is well. To exit out of `git log`, type `q`.
 
 The merge conflict is solved. Good job!
+
+If you ever need to reference GitHub commands because you forgot them, here's a nice little [cheat sheet](https://services.github.com/on-demand/downloads/github-git-cheat-sheet.pdf)! If you go there and still can't figure something out, check out [StackOverflow](https://stackoverflow.com/). 
 
 ## Optional sections 
 
@@ -300,41 +327,29 @@ The merge conflict is solved. Good job!
 
 To go into the folder containing the git repository, type the following command ("cd" == "change directory"):
 ```
-$ cd new-member-training
+cd new-member-training
 ```
 
-To list all files in this folder, type:
-```
-$ ls
-README.md		TrainingProgram.java	img
-```
+To list all files in this folder, type: `ls`.
 
-To print out the contents of a file (for example `TrainingProgram.java`), type:
+To print out the contents of a file (for example `class_button.txt`), type:
 ```
-$ cat TrainingProgram.java 
-public class TrainingProgram {
-  public static void main(String[] args) {
-    System.out.println("Robotics is fun!");
-    System.out.println("My favorite robot is R2-D2.");
-    System.out.println("Can't wait for the Velocity Vortex season!");
-    System.out.println("Better get ready!");
-  }
-}
+cat class_button.txt
 ```
 
 If you want more info on these commands, look them up in the manual using `man`:
 ```
-$ man cat
+man cat
 ```
 
-To exit out of the manual, press `q` to quit.
+To exit out of the manual, press `q`.
 
 Click [here](#your-mission) to get started on your mission.
 
 
 ### Optional discussion about git workflow
 
-The files you see online on GitHub in a repository (i.e. at https://github.com/WHSRobotics/new-member-training) are on the **remote repository**.
+The files you see online on GitHub in a repository (i.e. at https://github.com/WHSDigitalMedia/new-member-training) are on the **remote repository**, also sometimes referred to as the **origin**.
 
 When you clone the remote repository to your own local computer, you get a copy of the files there.  So the folder `new-member-training` that gets created that has all of the files in the remote repository is called the **local repository**.
 
@@ -342,27 +357,27 @@ The process of adding/removing/changing file(s) from your local repository to yo
 
 1. **Add the changed file(s).**  This stages them, i.e. lets you select which files you want to add/remove.
 
-2. **Commit the file(s).**  This neatly packages your changes with a commit message that lets everyone know why you made the changes, i.e. "Added driver control for drive train."
+2. **Commit the file(s).**  This neatly packages your changes with a commit message that lets everyone know why you made the changes, i.e. "Updated inventory sorting system."
 
 3. **Push the commit.**  This uploads your changes to the remote repository.
 
-You can [do this directly on GitHub](https://help.github.com/articles/managing-files-on-github/), but in general people will either [use the command line](https://help.github.com/articles/managing-files-using-the-command-line/), or a client like [SourceTree](https://www.sourcetreeapp.com/) or [GitKraken](https://www.gitkraken.com/).
+You can [do this on command line](https://help.github.com/articles/managing-files-using-the-command-line/), or a client like [GitHub](https://desktop.github.com/) or [GitKraken](https://www.gitkraken.com/).
 
-Let's say you want to add a file `HelloFellowRobots.java` to your remote repository `training-programs`.  Here are the steps you'd take to do that:
+Let's say you want to add a file `class_player.txt` to your remote repository `training-programs`.  Here are the steps you'd take to do that:
 
-0a. On your computer, **make the file `HelloFellowRobots.java`**
+0a. Find your remote repository `training-programs` on GitHub, and **clone it somewhere onto your computer**. To do so, first, press the green 'Clone or download' button. If you have the Github Desktop client, you can then press 'Open in Desktop'. Otherwise, copy the URL and type the following in commmand line. 
+```git clone URL```.
+    i. If there is no remote repository, you can [create one](https://github.com/new), assuming you have an account. 
 
-0b. Find your remote repository `training-programs` on GitHub, and **clone it somewhere onto your computer**.  How to clone a repo: https://help.github.com/articles/cloning-a-repository/
+0b. Let's say you cloned the repository to `~/GitHub/training-programs`. This is where your local repository is.  
 
-0c. Let's say you cloned the repository to `~/whs-robotics/training-programs`. This is where your local repository is.  **Move `HelloFellowRobots.java` into the `training-programs` folder.**
+0c. Now, create a file in that folder called `class_player.txt`.
 
 Add, commit, and push the files following any of these (or your own favorite client):
 
-- [directly on GitHub](https://help.github.com/articles/adding-a-file-to-a-repository/)
-
 - [the command line](https://help.github.com/articles/adding-a-file-to-a-repository-using-the-command-line/)
 
-- [SourceTree](https://confluence.atlassian.com/get-started-with-sourcetree/commit-and-push-a-change-git-847359114.html) 
+- [GitHub Desktop](https://help.github.com/desktop/guides/getting-started/)
 
 - [GitKraken](https://support.gitkraken.com/getting-started/guide)
  
