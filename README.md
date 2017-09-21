@@ -93,7 +93,7 @@ font = fnt_textbox;
 ```
 Edit line 16 in `class_button.txt` as such:
 ```
-    if mouse_check_button_pressed(mb_right) script_execute(action);
+    if mouse_check_button_pressed(mb_left) script_execute(action);
 ```
 
 What do we do next?  We can check the status of our git repository:
@@ -148,7 +148,7 @@ Switched to branch 'master'
 Your branch is up-to-date with 'origin/master'.
 ```
 
-Edit line 6 of `class_npc.txt` as follows (or at least have a favorite font that's not fnt_texbox):
+Edit line 6 of `class_button.txt` as follows (or at least have a favorite font that's not fnt_texbox):
 ```
 font = fnt_impact;
 ```
